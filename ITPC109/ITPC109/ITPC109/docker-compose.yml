@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  php-app:
+    build: .
+    container_name: itpc109-php-app
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql-db
+    environment:
+      - DB_HOST=mysql-db
+      - DB_USER=itpc109_user
+      - DB_PASSWORD=itpc109_password
+      - DB_NAME=itpc109_database
+    networks:
+      - app-network
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: itpc109-mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=itpc109_database
+      - MYSQL_USER=itpc109_user
+      - MYSQL_PASSWORD=itpc109_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: itpc109-phpmyadmin
+    ports:
+      - "8082:80"
+    environment:
+      - PMA_HOST=mysql-db
+      - PMA_PORT=3306
+    depends_on:
+      - mysql-db
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge
